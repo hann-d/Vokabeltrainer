@@ -11,7 +11,7 @@
  * Der Lernstand selbst liegt NICHT hier, sondern im Speicher des Browsers
  * (localStorage) – er bleibt bei Updates erhalten.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'vokabeltrainer-' + VERSION;
 
 const FILES = [

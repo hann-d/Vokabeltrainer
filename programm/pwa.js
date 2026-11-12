@@ -20,10 +20,12 @@
   /* ---------- 1. + 2. Offline-Teil und Updates ---------- */
   if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
 
+  let updateRequested = false;   // erst true, wenn auf „Jetzt laden“ geklickt wurde
   let reloading = false;
-  // Sobald die neue Version übernommen ist, die Seite einmal neu laden
+  // Sobald die neue Version übernommen ist, die Seite einmal neu laden.
+  // (Beim allerersten Öffnen übernimmt der Offline-Teil auch – dann NICHT neu laden.)
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (reloading) return;
+    if (!updateRequested || reloading) return;
     reloading = true;
     location.reload();
   });
@@ -41,6 +43,7 @@
     btn.addEventListener('click', () => {
       // Eine laufende Runde vorher merken, damit sie danach fortgesetzt werden kann
       if (typeof Quiz !== 'undefined' && document.getElementById('view-quiz').classList.contains('active')) Quiz.pause();
+      updateRequested = true;
       worker.postMessage('skipWaiting');
     });
     const later = document.createElement('button');
