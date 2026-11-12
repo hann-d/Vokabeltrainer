@@ -1,0 +1,145 @@
+Du hilfst mir, aus Fotos meines Vokabelteils (Schulbuch oder Vokabelheft) eine CSV-Datei für meinen Vokabeltrainer zu machen (https://hann-d.github.io/Vokabeltrainer/). Ich kenne mich mit CSV-Dateien und solchen Einstellungen nicht aus – erkläre alles einfach und ohne Fachwörter.
+
+Arbeite in genau diesen Schritten und halte die Reihenfolge ein:
+
+=====================================================================
+SCHRITT 1 – ERST FRAGEN, NOCH NICHTS ERSTELLEN
+=====================================================================
+Stelle mir zuerst ALLE folgenden Fragen in EINER Nachricht. Erstelle noch keine Datei.
+- Nummeriere die Fragen und gib bei jeder Antwortmöglichkeiten mit Buchstaben (a, b, c …) vor, damit ich nur kurz antworten muss, z. B. „1a, 2a, 3c …“.
+- Markiere bei jeder Frage den Vorschlag, der für die meisten passt, mit „(Vorschlag)“.
+- Schreib am Ende dazu: „Wenn du einfach ‚Vorschlag‘ antwortest, nehme ich überall den Vorschlag.“
+- Hast du die Bilder schon bekommen, schau sie dir vorher an und passe die Fragen an, was du siehst (z. B. „Ich sehe gelbe und grüne Markierungen – …“). Fehlen die Bilder noch, bitte mich am Ende der Nachricht, sie zu schicken.
+
+Die Fragen:
+
+1. Welche Sprache lernst du mit diesen Vokabeln?
+   a) Englisch (Vorschlag)  b) Französisch  c) Spanisch  d) Latein  e) andere: ___
+
+2. Welche Vokabeln sollen in die Datei?
+   a) Nur die, die ich markiert habe (Vorschlag) – z. B. mit Textmarker, unterstrichen, eingekreist oder abgehakt
+   b) Alle Vokabeln auf den Bildern
+   c) Alle, außer denen, die ich durchgestrichen habe
+
+3. Nur wenn bei 2 „a“: Woran erkennst du, was markiert ist?
+   a) Egal wie – alles, was irgendwie hervorgehoben ist, zählt (Vorschlag)
+   b) Nur eine bestimmte Farbe oder Art, nämlich: ___ (z. B. „nur gelb“ oder „nur unterstrichen“)
+
+4. Was soll außer den Vokabeln noch in die Datei? (Du kannst mehreres wählen, z. B. „4a, 4b“)
+   a) Beispielsätze – du tippst später den fremdsprachigen Satz, gezeigt wird die deutsche Übersetzung (Vorschlag)
+   b) Gegenteile (z. B. big ↔ small) (Vorschlag)
+   c) Synonyme (Wörter mit gleicher Bedeutung, z. B. big = large) (Vorschlag)
+   d) Nichts davon, nur die Vokabeln
+
+5. Nur wenn bei 4 Sätze gewählt: Welche Beispielsätze?
+   a) Nur Sätze, die ich selbst markiert habe (Vorschlag, wenn du bei 2 „a“ gewählt hast)
+   b) Zu jeder aufgenommenen Vokabel ihr Beispielsatz, auch wenn er nicht markiert ist
+   c) Alle Beispielsätze auf den Bildern
+
+6. Nur wenn bei 4 Gegenteile oder Synonyme gewählt: Welche?
+   a) Nur die, die ich selbst markiert habe (Vorschlag, wenn du bei 2 „a“ gewählt hast)
+   b) Zu jeder aufgenommenen Vokabel alle ihre Gegenteile/Synonyme
+   c) Alle auf den Bildern
+
+7. Wie sollen die Vokabeln in Gruppen aufgeteilt werden?
+   a) Eine Gruppe pro Bild, benannt nach Seitenzahl und Überschrift, z. B. „S. 76-79 - Family“ (Vorschlag)
+   b) Alles in eine einzige Gruppe mit dem Namen: ___
+   c) Eine Gruppe pro Überschrift/Abschnitt im Buch
+
+8. Was soll ich tun, wenn ich mir nicht sicher bin (z. B. ob etwas markiert ist oder wie ein Wort genau heißt)?
+   a) Lieber aufnehmen und dir sagen, was du prüfen sollst – Löschen ist leichter als Hinzufügen (Vorschlag)
+   b) Lieber weglassen und dir sagen, was ich weggelassen habe
+
+9. Gibt es Besonderheiten in deinem Buch oder Heft, die ich wissen sollte? (z. B. „Das Deutsche steht links“, „In der dritten Spalte stehen Wortfamilien“, „Notizen in Bleistift bitte ignorieren“)
+   a) Nein (Vorschlag)  b) Ja: ___
+
+Warte auf meine Antworten. Fange erst danach mit Schritt 2 an. Ist eine Antwort unklar, frag einmal kurz nach.
+
+=====================================================================
+SCHRITT 2 – DIE BILDER LESEN
+=====================================================================
+- Finde zuerst den Aufbau der Seite heraus. Typisch ist: Vokabel mit Übersetzung, daneben oder darunter ein Beispielsatz, am Rand Gegenteile (Zeichen ↔, ≠, opp.) oder Synonyme (Zeichen =, syn.). Bücher sind aber verschieden – richte dich nach dem, was du siehst, und nach meiner Antwort auf Frage 9.
+- Die Fotos sind oft schräg. Ordne Sätze und Gegenteile/Synonyme der Vokabel zu, zu der sie inhaltlich gehören, nicht nur nach der Höhe im Bild.
+- Halte dich genau an meine Antworten aus Schritt 1.
+- Bei „nur markiert“ gilt: Eine Vokabel zählt als markiert, wenn die fremdsprachige Vokabel ODER ihre deutsche Bedeutung markiert ist. Die andere Hälfte nimmst du aus derselben Zeile dazu.
+- Ist von einem Satz nur ein Teil markiert, nimm nur diesen Teil. Endet er mitten im Satz, lass Bindewörter und Satzzeichen am Ende weg und setz einen Punkt (bei Fragen ein Fragezeichen). Übersetze auch nur diesen Teil.
+- Ist ein Wort im Bild abgeschnitten, aber von Hand daneben geschrieben oder im Beispielsatz zu erkennen, nimm es trotzdem auf und nenne es unter „Bitte prüfen“.
+- Handschriftliche Notizen: Hinweise zur Wortart oder Bedeutung (z. B. „hier Adjektiv“) kommen in runden Klammern hinter das Wort. Andere Notizen (z. B. Grammatik-Hinweise) kommen nicht in die Datei – nenne sie kurz unter „Hinweise“.
+
+=====================================================================
+SCHRITT 3 – DIE DATEI ERSTELLEN
+=====================================================================
+FORMAT (genau so, sonst kann der Trainer die Datei nicht lesen):
+- CSV, Trennzeichen Semikolon ( ; ), Kodierung UTF-8 ohne BOM.
+- Erste Zeile immer genau so (auch wenn ich nicht Englisch lerne – die zweite Spalte ist dann einfach meine Fremdsprache):
+  Deutsch;Englisch;Gruppe;Typ
+- Genau 4 Spalten pro Zeile. Kein Semikolon innerhalb eines Feldes (falls nötig durch Komma ersetzen).
+- Keine doppelten Anführungszeichen ( " ). Steht ein Satz im Buch in Anführungszeichen, lass sie weg.
+- Nur Zeichen, die man auf einer deutschen Tastatur leicht tippen kann: Apostroph immer als ' (nicht ’), Gedankenstrich als normaler Bindestrich - (nicht –). Akzente (é, è, ñ, ç …) bleiben so, wie sie im Buch stehen.
+
+SPALTE „Typ“:
+- leer lassen = normale Vokabel  →  Deutsch;Fremdsprache;Gruppe;
+- Satz        = Beispielsatz      →  deutsche Übersetzung;fremdsprachiger Satz;Gruppe;Satz
+- Gegenteil   = Gegenteil-Paar    →  Vokabel;Gegenteil;Gruppe;Gegenteil   (beide in der Fremdsprache)
+- Synonym     = Synonym-Paar      →  Vokabel;Synonym;Gruppe;Synonym       (beide in der Fremdsprache)
+
+BEISPIEL (Englisch):
+  Deutsch;Englisch;Gruppe;Typ
+  gehen;to go (went, gone);S. 75 - Stages of life;
+  Ich freue mich auf das Wochenende.;I'm looking forward to the weekend.;S. 75 - Stages of life;Satz
+  cheap;expensive;S. 75 - Stages of life;Gegenteil
+  big;huge;S. 75 - Stages of life;Synonym
+
+REGELN FÜR VOKABELN:
+- Die Fremdsprache genau so übernehmen wie im Buch, mit „to“ bei englischen Verben und mit Artikel bei Nomen, wenn er im Buch steht (z. B. „the journey“, „la maison“). Steht etwas im Buch in Klammern, z. B. „(to) gossip“, lass es so.
+- Abkürzungen wie sb, sth, jdn., jdm., etw., qn, qc genau so lassen, wie sie im Buch stehen.
+- Zusatzinfos, die man NICHT mit eintippen soll, kommen in runde Klammern, z. B. unregelmäßige Formen „to leave (left, left)“, Hinweise wie „(AE)“, „(coll.)“, „(pl)“, „(f)“. Eckige Klammern aus dem Buch werden zu runden. Alles in Klammern wird vom Trainer nicht abgefragt, sondern nur als Hinweis gezeigt.
+- Mehrere deutsche Bedeutungen alle nehmen, durch Komma getrennt, z. B. „ankommen, eintreffen“.
+- Britisch/amerikanisch mit Schrägstrich (z. B. „colour/color“): nur die britische Form, die andere in Klammern: „colour (AE: color)“.
+- Andere Schrägstriche (z. B. männlich/weiblich wie „fiancé/fiancée“, „le copain/la copine“) und Gender-Sternchen lässt du so, wie sie im Buch stehen.
+- Haben zwei Vokabeln genau dieselbe deutsche Bedeutung, ergänze hinter der deutschen Bedeutung ein Synonym aus dem Buch als Hinweis in Klammern, z. B. „der*die Jugendliche (= teenager)“, damit man weiß, welche gemeint ist. Gibt es keins, nenne den Fall unter „Hinweise“.
+
+REGELN FÜR SÄTZE:
+- Fremdsprachige Spalte = der Satz mit den gleichen Wörtern wie im Buch (Satzzeichen wie im Buch, aber mit den Tastatur-Zeichen von oben).
+- Deutsche Spalte = eine natürliche, gut verständliche Übersetzung, die möglichst eindeutig zu genau diesem Satz führt. Die gelernte Vokabel soll in der Übersetzung klar erkennbar sein.
+- NAMEN WERDEN NICHT ÜBERSETZT: Personen (z. B. „Emily“, „Mr Brown“), Orte und Sehenswürdigkeiten (z. B. „London“, „Tower Bridge“), Schulen, Firmen, Marken und Titel bleiben in der Übersetzung genau so wie im Original. Auch „Mr“, „Mrs“, „Ms“, „Monsieur“, „Madame“ vor einem Namen bleiben. Aus „Emily lives in New York.“ wird „Emily wohnt in New York.“ – nicht „Emilia“ und nicht „Neu York“.
+
+REGELN FÜR GEGENTEILE UND SYNONYME:
+- 1. Spalte = die Vokabel in der Fremdsprache (dieses Wort wird gezeigt).
+- 2. Spalte = das Gegenteil bzw. Synonym (das muss man eintippen), ohne die Zeichen =, ≠, ↔ usw.
+- Keine deutschen Wörter in diesen Zeilen (außer Hinweisen in Klammern).
+- Mehrere Gegenteile/Synonyme: für jedes eine eigene Zeile.
+
+GRUPPEN UND REIHENFOLGE:
+- Gruppen so, wie ich es bei Frage 7 gewählt habe. Bei „eine Gruppe pro Bild“: „S. “ + Seitenzahlen + „ - “ + Abschnittsüberschriften, durch Komma getrennt. Sind keine Seitenzahlen zu sehen, nimm „Bild 1“, „Bild 2“ usw.
+- Gleiche Schreibweise für alle Zeilen einer Gruppe.
+- Reihenfolge wie im Buch, von oben nach unten (bei Doppelseiten erst links, dann rechts). Direkt nach jeder Vokabel kommen ihr Satz und dann ihre Gegenteile/Synonyme.
+- Keine doppelten Zeilen. Kommt dieselbe Vokabel auf mehreren Bildern vor, nur beim ersten Mal aufnehmen.
+- Alle Bilder, die ich schicke, gehören in EINE Datei.
+
+=====================================================================
+SCHRITT 4 – AUSGABE
+=====================================================================
+1. Die CSV als Datei zum Herunterladen mit dem Namen „vokabeln.csv“. Falls das nicht geht: als ein einziger Codeblock, den ich 1:1 kopieren kann, ohne weiteren Text darin.
+2. Eine kurze Übersicht als Tabelle: pro Gruppe die Anzahl der Vokabeln, Sätze, Gegenteile und Synonyme.
+3. „Bitte prüfen“: nur Stellen, bei denen du unsicher warst – jeweils Bildnummer, ungefähre Stelle (z. B. „Bild 2, links unten“), was unsicher ist und welche Zeile(n) du deshalb in die Datei geschrieben hast. Wenn alles klar war: „Alles eindeutig“.
+4. „Hinweise“: höchstens 3 kurze Punkte (z. B. weggelassene Notizen).
+5. „So geht es weiter“ – genau diese kurze Anleitung:
+   • Die Datei „vokabeln.csv“ herunterladen.
+   • Den Vokabeltrainer öffnen (https://hann-d.github.io/Vokabeltrainer/) → oben „Importieren“ → Datei in das Feld ziehen oder „Datei auswählen“.
+   • In der Vorschau kontrollieren (rot/gelb markierte Zeilen ansehen), bei „Test“ optional einen Namen eintragen, z. B. „Englisch-Arbeit 2“ → „Übernehmen“.
+
+Prüfe vor der Ausgabe noch einmal jedes Bild Zeile für Zeile, ob du alles erfasst hast, was nach meinen Antworten dazugehört, und ob jede Zeile genau 4 Spalten hat. Erfinde nichts dazu.
+
+=====================================================================
+SCHRITT 5 – ZUM SCHLUSS FRAGEN: PERSÖNLICHER PROMPT
+=====================================================================
+Frage mich ganz am Ende:
+„Soll ich dir diesen Prompt so umschreiben, dass deine Antworten schon drinstehen? Dann musst du beim nächsten Mal keine Fragen mehr beantworten – du kopierst einfach den neuen Prompt, hängst die Bilder an und bekommst sofort die Datei.“
+
+Wenn ich „ja“ sage:
+- Schreib den kompletten Prompt neu, in EINEM Codeblock zum Kopieren.
+- Lass Schritt 1 (die Fragen) und diesen Schritt 5 weg. Schreib stattdessen ganz oben einen Abschnitt „MEINE EINSTELLUNGEN“, in dem meine Antworten als klare Regeln stehen (z. B. „Sprache: Französisch“, „Nur markierte Vokabeln, markiert = gelber Textmarker“, „Sätze: nur markierte“ …).
+- Alle Regeln, die nach meinen Antworten nicht gebraucht werden, lässt du weg (z. B. die Regeln für Sätze, wenn ich keine Sätze will). Alles andere – Format, Regeln, Ausgabe – bleibt vollständig und genau so erhalten.
+- Der neue Prompt soll ohne Rückfragen sofort mit den Bildern arbeiten. Nur wenn etwas wirklich unklar ist, darf er unter „Bitte prüfen“ nachfragen.
+- Erkläre mir in zwei Sätzen, wie ich ihn benutze (in einen neuen Chat kopieren, Bilder anhängen, abschicken).
