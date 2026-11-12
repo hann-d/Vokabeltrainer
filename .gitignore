@@ -1,0 +1,15 @@
+# Diese Dateien werden NICHT zu GitHub hochgeladen (privat bzw. nur für diesen PC)
+
+# Dein Lernstand und heruntergeladene Sicherungen
+Lernstand.json
+vokabeltrainer-sicherung-*.json
+
+# Deine Vokabellisten und Prompts
+Vokabellisten/
+
+# Einstellungen von Claude
+.claude/
+
+# Windows-Kram
+Thumbs.db
+desktop.ini

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Tests – compare.js</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { padding: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border-bottom: 1px solid #ddd; padding: 6px 8px; text-align: left; vertical-align: top; }
+    .pass { color: #1a7f37; font-weight: bold; }
+    .fail { color: #cf222e; font-weight: bold; }
+    #summary { font-size: 1.3em; margin: 10px 0 20px; }
+    code { background: #f2f2f2; padding: 1px 4px; border-radius: 3px; }
+    .marks { font-family: Consolas, monospace; white-space: pre; }
+    .m-ok { background: var(--good-bg); } .m-wrong, .m-extra { background: var(--bad-bg); }
+    .m-missing { background: var(--miss-bg); } .m-swap { background: var(--swap-bg); }
+    .m-neutral { color: #888; }
+  </style>
+</head>
+<body>
+  <h1>Tests für compare.js</h1>
+  <div id="summary"></div>
+  <table>
+    <thead><tr><th>Ergebnis</th><th>Test</th><th>Details / Anzeige</th></tr></thead>
+    <tbody id="results"></tbody>
+  </table>
+
+  <script src="compare.js"></script>
+  <script>
+    'use strict';
+    const C = window.VokabelCompare;
+
+    // Markierungen kompakt als Text (unabhängig von der Darstellung): . = richtig, W = falsch, X = überflüssig,
+    // S = Dreher, M = fehlt
+    const CODE = { ok: '.', wrong: 'W', extra: 'X', swap: 'S', missing: 'M', neutral: 'n' };
+    const code = marks => marks.map(m => CODE[m.type]).join('');
+
+    // Kleine Anzeige der Markierung (wie in der App)
+    function renderMarks(marks) {
+      return '<span class="marks">' + marks.map(m => {
+        const ch = m.ch === ' ' ? (m.type === 'ok' ? '&nbsp;' : '·') : m.ch.replace(/</g, '&lt;');
+        return '<span class="m-' + m.type + '">' + ch + '</span>';
+      }).join('') + '</span>';
+    }
+
+    const tests = [];
+    function test(name, fn) { tests.push({ name, fn }); }
+    function eq(actual, expected, what) {
+      if (actual !== expected) {
+        throw new Error((what || 'Wert') + ': erwartet ' + JSON.stringify(expected) +
+                        ', bekommen ' + JSON.stringify(actual));
+      }
+    }
+
+    /* ---------- Richtig / falsch ---------- */
+    test('Identische Antwort ist richtig', () => {
+      eq(C.check('house', 'house').correct, true, 'correct');
+    });
+    test('Großschreibung zählt: "haus" ≠ "Haus"', () => {
+      const r = C.check('haus', 'Haus');
+      eq(r.correct, false, 'correct');
+      eq(code(r.inputMarks), 'W...', 'Eingabe');
+      eq(code(r.solutionMarks), 'W...', 'Lösung');
+      return r;
+    });
+    test('Großschreibung zählt: "Haus" ≠ "haus"', () => {
+      eq(C.check('Haus', 'haus').correct, false, 'correct');
+    });
+
+    /* ---------- Leerzeichen und Apostrophe ---------- */
+    test('Leerzeichen am Anfang/Ende werden ignoriert', () => {
+      eq(C.check('   the house  ', 'the house').correct, true, 'correct');
+    });
+    test('Mehrere Leerzeichen zählen wie eines', () => {
+      eq(C.check('the    house', 'the house').correct, true, 'correct');
+    });
+    test('Fehlendes Leerzeichen ist ein Fehler ("thehouse")', () => {
+      const r = C.check('thehouse', 'the house');
+      eq(r.correct, false, 'correct');
+      eq(code(r.inputMarks), '...M.....', 'Eingabe');
+      return r;
+    });
+    test('Typografischer Apostroph ’ zählt wie \'', () => {
+      eq(C.check('don’t', "don't").correct, true, 'correct');
+      eq(C.check("don't", 'don‘t').correct, true, 'correct (umgekehrt)');
+    });
+
+    /* ---------- sb. / sth. ---------- */
+    test('sb. = sb = somebody', () => {
+      eq(C.check('to help sb', 'to help sb.').correct, true, 'sb');
+      eq(C.check('to help somebody', 'to help sb.').correct, true, 'somebody');
+      eq(C.check('to help sb.', 'to help somebody').correct, true, 'umgekehrt');
+    });
+    test('sth. = sth = something', () => {
+      eq(C.check('to get sth done', 'to get sth. done').correct, true, 'sth');
+      eq(C.check('to get something done', 'to get sth. done').correct, true, 'something');
+      eq(C.check('to get sth. done', 'to get something done').correct, true, 'umgekehrt');
+    });
+    test('Mehrere Abkürzungen: "give somebody sth" = "give sb. sth."', () => {
+      eq(C.check('give somebody sth', 'give sb. sth.').correct, true, 'correct');
+    });
+    test('sb./sth. nur als ganzes Wort ("sthe" bleibt "sthe")', () => {
+      eq(C.canonical('sthe'), 'sthe', 'canonical');
+      eq(C.canonical('somebodys'), 'somebodys', 'canonical');
+    });
+    test('Groß geschriebenes "Somebody" gilt nicht als sb.', () => {
+      eq(C.check('to help Somebody', 'to help sb.').correct, false, 'correct');
+    });
+    test('Tippfehler + "somebody": nur der Dreher wird markiert', () => {
+      const r = C.check('to hlep somebody', 'to help sb.');
+      eq(r.correct, false, 'correct');
+      eq(code(r.inputMarks), '....SS..........', 'Eingabe');
+      return r;
+    });
+
+    /* ---------- Beispiele aus der Spezifikation ---------- */
+    test('"hous" statt "house": fehlendes e am Ende', () => {
+      const r = C.check('hous', 'house');
+      eq(r.correct, false, 'correct');
+      eq(r.tooWrong, false, 'tooWrong');
+      eq(code(r.inputMarks), '....M', 'Eingabe');
+      eq(code(r.solutionMarks), '....M', 'Lösung');
+      eq(r.solutionMarks[4].ch, 'e', 'markiertes Zeichen');
+      return r;
+    });
+    test('"huose" statt "house": "uo" als Dreher', () => {
+      const r = C.check('huose', 'house');
+      eq(r.distance, 1, 'Fehlerzahl');
+      eq(code(r.inputMarks), '.SS..', 'Eingabe');
+      eq(code(r.solutionMarks), '.SS..', 'Lösung');
+      return r;
+    });
+    test('"walkd" statt "walked": fehlendes e', () => {
+      const r = C.check('walkd', 'walked');
+      eq(r.distance, 1, 'Fehlerzahl');
+      eq(code(r.inputMarks), '....M.', 'Eingabe');
+      eq(code(r.solutionMarks), '....M.', 'Lösung');
+      eq(r.solutionMarks[4].ch, 'e', 'markiertes Zeichen');
+      return r;
+    });
+
+    /* ---------- Weitere Fehlerarten ---------- */
+    test('Falsches Zeichen (ersetzt): "hoase" statt "house"', () => {
+      const r = C.check('hoase', 'house');
+      eq(code(r.inputMarks), '..W..', 'Eingabe');
+      eq(code(r.solutionMarks), '..W..', 'Lösung');
+      return r;
+    });
+    test('Überflüssiges Zeichen: "hoouse" statt "house"', () => {
+      const r = C.check('hoouse', 'house');
+      eq(r.distance, 1, 'Fehlerzahl');
+      eq(code(r.inputMarks).split('X').length - 1, 1, 'Anzahl überflüssig');
+      eq(code(r.solutionMarks), '.....', 'Lösung');
+      return r;
+    });
+
+    test('Dreher + fehlender Punkt: "sht" statt "sth."', () => {
+      const r = C.check('to get sht done', 'to get sth. done');
+      eq(r.distance, 2, 'Fehlerzahl');
+      eq(code(r.solutionMarks), '........SSM.....', 'Lösung');
+      return r;
+    });
+
+    /* ---------- Komplett falsch ---------- */
+    test('Komplett falsch: keine Zeichenmarkierung ("xyz" statt "house")', () => {
+      const r = C.check('xyz', 'house');
+      eq(r.correct, false, 'correct');
+      eq(r.tooWrong, true, 'tooWrong');
+      return r;
+    });
+    test('Leere Eingabe zählt als komplett falsch', () => {
+      const r = C.check('   ', 'house');
+      eq(r.correct, false, 'correct');
+      eq(r.tooWrong, true, 'tooWrong');
+    });
+    test('Genau die Hälfte falsch ist noch NICHT komplett falsch ("hoxxe" vs "house" = 2/5)', () => {
+      eq(C.check('hoxxe', 'house').tooWrong, false, 'tooWrong');
+    });
+
+    /* ---------- Klammern (Bemerkung, wird nicht abgefragt) ---------- */
+    test('Klammertext muss nicht getippt werden: "to go" = "to go (went, gone)"', () => {
+      const r = C.check('to go', 'to go (went, gone)');
+      eq(r.correct, true, 'correct');
+      eq(r.remark, '(went, gone)', 'Bemerkung');
+      eq(r.solution, 'to go', 'Lösung ohne Klammer');
+    });
+    test('Getippter Klammertext stört nicht: "to go (went)"', () => {
+      eq(C.check('to go (went)', 'to go (went, gone)').correct, true, 'correct');
+    });
+    test('Klammer in der Mitte: "to look (sth.) up" verlangt "to look up"', () => {
+      eq(C.check('to look up', 'to look (sth.) up').correct, true, 'correct');
+      eq(C.splitRemark('to look (sth.) up').main, 'to look up', 'main');
+    });
+    test('Fehler mit Klammer-Lösung wird ohne Klammer markiert', () => {
+      const r = C.check('to goo', 'to go (went, gone)');
+      eq(r.correct, false, 'correct');
+      eq(code(r.solutionMarks), '.....', 'Lösung');
+      return r;
+    });
+
+    /* ---------- Sätze ---------- */
+    const S = { sentence: true };
+    test('Satz: Punkt am Ende ist egal', () => {
+      eq(C.check('I have to get this done', 'I have to get this done.', S).correct, true, 'ohne Punkt');
+      eq(C.check('I have to get this done!', 'I have to get this done.', S).correct, true, 'mit !');
+      eq(C.check('Who are you', 'Who are you?', S).correct, true, 'ohne ?');
+    });
+    test('Vokabel (kein Satz): Punkt am Ende zählt weiterhin', () => {
+      eq(C.check('isn\'t it', 'isn\'t it?').correct, false, 'correct');
+    });
+    test('Satz: Komma in der Mitte zählt', () => {
+      const r = C.check('Yes I do.', 'Yes, I do.', S);
+      eq(r.correct, false, 'correct');
+      eq(code(r.inputMarks), '...M.....n', 'Eingabe');
+      return r;
+    });
+    test('Satz: Groß-/Kleinschreibung ist egal', () => {
+      eq(C.check('i like it.', 'I like it.', S).correct, true, 'correct');
+      eq(C.check('WE COME HOME', 'We come home.', S).correct, true, 'alles groß');
+    });
+    test('Satz: Fehlermarkierung ignoriert Groß-/Kleinschreibung', () => {
+      const r = C.check('i lkie it', 'I like it.', S);
+      eq(r.correct, false, 'correct');
+      eq(code(r.inputMarks), '...SS....', 'Eingabe');
+      return r;
+    });
+    test('Vokabel: Großschreibung zählt weiterhin', () => {
+      eq(C.check('monday', 'Monday').correct, false, 'correct');
+    });
+
+    /* ---------- Apostroph und Kurzformen ---------- */
+    test('Apostroph darf fehlen oder Leerzeichen sein: dont = don t = don\'t', () => {
+      eq(C.check('dont', "don't").correct, true, 'dont');
+      eq(C.check('don t', "don't").correct, true, 'don t');
+      eq(C.check("I don't care", 'I dont care').correct, true, 'umgekehrt');
+    });
+    test('Ausgeschrieben zählt: "do not" = "don\'t", "I am" = "I\'m"', () => {
+      eq(C.check('I do not care.', "I don't care.", S).correct, true, 'do not');
+      eq(C.check('I am late', "I'm late").correct, true, 'I am');
+      eq(C.check("I'm late", 'I am late').correct, true, 'umgekehrt');
+      eq(C.check('Im late', "I'm late").correct, true, 'Im');
+      eq(C.check('cannot', "can't").correct, true, 'cannot');
+      eq(C.check('can not', "can't").correct, true, 'can not');
+      eq(C.check('will not', "won't").correct, true, 'will not');
+    });
+    test('Mehrdeutig: he\'s = he is = he has', () => {
+      eq(C.check('He has got a dog.', "He's got a dog.", S).correct, true, 'has');
+      eq(C.check('He is nice.', "He's nice.", S).correct, true, 'is');
+    });
+    test('Aber "He is a dog" ≠ "He has a dog"', () => {
+      eq(C.check('He is a dog.', 'He has a dog.', S).correct, false, 'correct');
+    });
+    test('Verschiedene Kurzformen derselben Langform: "he\'s not" = "he isn\'t"', () => {
+      eq(C.check("he's not", "he isn't").correct, true, 'correct');
+    });
+    test('"its" zählt für "it\'s", "were" für "we\'re"', () => {
+      eq(C.check('its late', "it's late").correct, true, 'its');
+      eq(C.check('were late', "we're late").correct, true, 'were');
+    });
+    test('Aber "it\'s" zählt nicht für das Wort "its" (sein/ihr)', () => {
+      eq(C.check("the dog and it's ball", 'the dog and its ball').correct, false, 'correct');
+    });
+    test('Andere Apostrophe: Toms = Tom s = Tom\'s, o clock = o\'clock', () => {
+      eq(C.check('Toms bike', "Tom's bike").correct, true, 'Toms');
+      eq(C.check('Tom s bike', "Tom's bike").correct, true, 'Tom s');
+      eq(C.check('at six o clock', "at six o'clock").correct, true, 'o clock');
+      eq(C.check('at six oclock', "at six o'clock").correct, true, 'oclock');
+    });
+    test('Groß/klein bei Kurzformen in Vokabeln zählt: "i\'m" ≠ "I\'m"', () => {
+      eq(C.check("i'm", "I'm").correct, false, 'correct');
+    });
+    test('Markierung: "I do not kare" vs "I don\'t care" → nur der Tippfehler', () => {
+      const r = C.check('I do not kare', "I don't care");
+      eq(r.correct, false, 'correct');
+      eq(code(r.inputMarks), '.........W...', 'Eingabe');
+      return r;
+    });
+    test('Markierung: "I dont kare" → fehlender Apostroph ist kein Fehler', () => {
+      const r = C.check('I dont kare', "I don't care");
+      eq(code(r.inputMarks), '.......W...', 'Eingabe');
+      return r;
+    });
+    test('Markierung: "its lat" für "it\'s late" → nur das fehlende e', () => {
+      const r = C.check('its lat', "it's late");
+      eq(code(r.inputMarks), '.......M', 'Eingabe');
+      return r;
+    });
+    test('Satz mit sb./sth. am Ende: "I help somebody." = "I help sb."', () => {
+      eq(C.check('I help somebody.', 'I help sb.', S).correct, true, 'correct');
+    });
+
+    /* ---------- Artikel ignorieren ---------- */
+    const EN = { ignoreArticle: 'en' }, DE = { ignoreArticle: 'de' };
+    test('Artikel egal: "house" = "the house"', () => {
+      eq(C.check('house', 'the house', EN).correct, true, 'ohne the');
+      eq(C.check('the house', 'the house', EN).correct, true, 'mit the');
+      eq(C.check('a house', 'the house', EN).correct, true, 'mit a');
+      eq(C.check('the climate change', 'climate change', EN).correct, true, 'the zu viel');
+    });
+    test('Artikel nur am Anfang: "the" in der Mitte zählt', () => {
+      eq(C.check('to protect environment', 'to protect the environment', EN).correct, false, 'correct');
+    });
+    test('Ohne Option zählt der Artikel weiterhin', () => {
+      eq(C.check('house', 'the house').correct, false, 'correct');
+    });
+    test('Deutsch: "Haus" = "das Haus"', () => {
+      eq(C.check('Haus', 'das Haus', DE).correct, true, 'correct');
+      eq(C.check('Hause', 'das Haus', DE).correct, false, 'Tippfehler');
+    });
+    test('Englische Artikel werden auf Deutsch nicht entfernt ("an etwas denken")', () => {
+      eq(C.check('etwas denken', 'an etwas denken', DE).correct, false, 'correct');
+    });
+    test('Fehler ohne Artikel: "hous" vs "the house" → nur das e fehlt', () => {
+      const r = C.check('hous', 'the house', EN);
+      eq(r.correct, false, 'correct');
+      eq(r.tooWrong, false, 'tooWrong');
+      eq(code(r.inputMarks), '....M', 'Eingabe');
+      eq(code(r.solutionMarks), 'nnnn....M', 'Lösung');
+      return r;
+    });
+    test('Ein Wort, das nur aus einem Artikel besteht, bleibt erhalten ("a" → "ein")', () => {
+      eq(C.check('ein', 'ein', DE).correct, true, 'correct');
+      eq(C.check('the', 'the', EN).correct, true, 'correct');
+    });
+    test('Bei Sätzen zählt der Artikel', () => {
+      eq(C.check('Train leaves.', 'The train leaves.', { sentence: true, ignoreArticle: 'en' }).correct, false, 'correct');
+    });
+
+    /* ---------- Testlauf ---------- */
+    let passed = 0;
+    const tbody = document.getElementById('results');
+    for (const t of tests) {
+      const tr = document.createElement('tr');
+      let ok = true, details = '';
+      try {
+        const r = t.fn();
+        if (r && r.inputMarks) {
+          details = 'Eingabe: ' + renderMarks(r.inputMarks) + '<br>Lösung: ' + renderMarks(r.solutionMarks);
+        }
+      } catch (e) {
+        ok = false;
+        details = '<code>' + String(e.message).replace(/</g, '&lt;') + '</code>';
+      }
+      if (ok) passed++;
+      tr.innerHTML = '<td class="' + (ok ? 'pass">✔ OK' : 'fail">✘ FEHLER') + '</td><td>' +
+        t.name.replace(/</g, '&lt;') + '</td><td>' + details + '</td>';
+      tbody.appendChild(tr);
+    }
+    const sum = document.getElementById('summary');
+    sum.className = passed === tests.length ? 'pass' : 'fail';
+    sum.textContent = passed + ' von ' + tests.length + ' Tests bestanden';
+    document.title = (passed === tests.length ? '✔ ' : '✘ ') + document.title;
+  </script>
+</body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Vokabeltrainer</title>
+  <!-- Installierbare App: Beschreibung, Symbole, Farbe der Titelleiste -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="programm/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="programm/icons/icon-180.png">
+  <meta name="theme-color" content="#2f5d8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Vokabeln">
+  <link rel="stylesheet" href="programm/style.css">
+  <script>
+    // Hell/Dunkel sofort setzen (vor dem Zeichnen der Seite), damit nichts aufblitzt
+    (function () {
+      var t = 'auto';
+      try { t = JSON.parse(localStorage.getItem('vokabeltrainer.v1')).settings.theme || 'auto'; } catch (e) {}
+      var dark = t === 'dark' || (t === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    })();
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="logo" data-nav="home">Vokabeltrainer</span>
+      <nav id="mainnav">
+        <button data-nav="home">Start</button>
+        <button data-nav="plan">Lernplan</button>
+        <button data-nav="manage">Vokabeln &amp; Gruppen</button>
+        <button data-nav="import">Importieren</button>
+        <button id="theme-toggle" class="theme-toggle" title="Hell / Dunkel / wie Windows"></button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= Startseite ================= -->
+    <section id="view-home" class="view">
+      <!-- Unterbrochene Runden zum Fortsetzen -->
+      <div id="home-paused" class="panel paused" hidden></div>
+
+      <div class="home-grid">
+        <div class="panel">
+          <h2>Langzeit lernen</h2>
+          <p class="muted">Alle fälligen Vokabeln aus allen Gruppen, Deutsch → Englisch.</p>
+          <p id="home-stats" class="figures"></p>
+          <button id="btn-longterm" class="primary wide">Starten</button>
+          <p id="longterm-note" class="muted small"></p>
+          <div class="more-today">
+            <span>Heute mehr lernen:</span>
+            <input type="number" id="more-count" min="1" max="200" value="10" class="num-input">
+            <span>neue Wörter</span>
+            <button id="btn-more">Hinzufügen</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Arbeit lernen</h2>
+          <p class="muted">Gruppen auswählen und gezielt üben – Vokabeln, Synonyme, Gegenteile und Sätze.</p>
+          <p class="figures" id="home-total"></p>
+          <button id="btn-test" class="wide">Auswählen</button>
+        </div>
+      </div>
+
+      <div class="home-grid three">
+        <div class="panel">
+          <h2>Lernplan zur Arbeit</h2>
+          <div id="home-plans" class="home-plans"></div>
+          <button data-nav="plan" class="link small">Lernpläne verwalten</button>
+        </div>
+
+        <div class="panel">
+          <h2>Problemwörter</h2>
+          <p class="muted small">Mindestens 3-mal falsch – bis sie 3-mal hintereinander richtig waren.</p>
+          <p id="home-problems" class="figures"></p>
+          <div class="button-row">
+            <button id="btn-problems-practice">Üben</button>
+            <button id="btn-problems-show">Anzeigen</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Merkliste</h2>
+          <p class="muted small">Einträge, die du in der Abfrage mit „Merken“ markiert hast.</p>
+          <p id="home-marked" class="figures"></p>
+          <div class="button-row">
+            <button id="btn-marked-practice">Üben</button>
+            <button id="btn-marked-show">Anzeigen</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Karteikasten</h2>
+        <p class="muted small">Vokabeln pro Fach. Klick auf ein Fach zeigt die Wörter darin.</p>
+        <div id="home-box" class="box-chart"></div>
+      </div>
+
+      <div class="home-grid">
+        <div class="panel">
+          <h2>Einstellungen</h2>
+          <div class="settings">
+            <label for="set-newperday">Neue Wörter pro Tag (Langzeit)</label>
+            <input type="number" id="set-newperday" min="0" max="500" step="1" class="num-input">
+            <label for="set-blocksize">Wörter pro Block (erst einprägen, dann abfragen)</label>
+            <input type="number" id="set-blocksize" min="1" max="100" step="1" class="num-input">
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Speichern</h2>
+          <p class="muted small">Dein Lernstand wird nach jeder Antwort im Browser gespeichert. Zusätzlich speichert die App automatisch eine Kopie
+            („Lernstand.json“) in einen Ordner deiner Wahl – am besten den Vokabeltrainer-Ordner.</p>
+          <p id="autosave-status" class="backup-hint"></p>
+          <div class="button-row">
+            <button id="btn-autosave" class="primary"></button>
+          </div>
+          <details class="more-options">
+            <summary>Weitere Möglichkeiten</summary>
+            <p id="backup-hint" class="muted small"></p>
+            <div class="button-row">
+              <button id="btn-backup-save">Sicherung herunterladen</button>
+              <button id="btn-backup-load">Sicherung aus Datei laden</button>
+            </div>
+          </details>
+          <input type="file" id="backup-file" accept=".json,application/json" hidden>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Lernplan ================= -->
+    <section id="view-plan" class="view">
+      <div class="panel narrow">
+        <h2>Lernpläne</h2>
+        <p class="muted small">Die Wörter werden gleichmäßig auf die Tage bis zum Tag vor der Arbeit verteilt.
+          Jeden Tag kommt eine neue Portion dran, dazu die Wörter, die du beim letzten Mal falsch hattest.
+          Am letzten Tag vor der Arbeit gibt es eine Generalprobe mit allen Wörtern.</p>
+        <div id="plan-list" class="plan-list"></div>
+      </div>
+
+      <div class="panel narrow">
+        <h2>Neuer Lernplan</h2>
+        <div class="plan-form">
+          <label>Name <input type="text" id="plan-name" placeholder="z. B. Englisch-Arbeit Unit 5"></label>
+          <label>Datum der Arbeit <input type="date" id="plan-date"></label>
+        </div>
+        <h3>Tests und Gruppen</h3>
+        <div id="plan-groups"></div>
+        <h3>Was abfragen?</h3>
+        <div id="plan-types" class="checklist"></div>
+        <h3>Richtung <span class="muted small">(für Vokabeln und Sätze)</span></h3>
+        <label class="radio"><input type="radio" name="plan-direction" value="de-en" checked> Deutsch → Englisch</label>
+        <label class="radio"><input type="radio" name="plan-direction" value="en-de"> Englisch → Deutsch</label>
+        <div class="button-row spaced">
+          <button id="plan-create" class="primary">Lernplan anlegen</button>
+          <span id="plan-info" class="muted"></span>
+        </div>
+        <p id="plan-message" class="message"></p>
+      </div>
+    </section>
+
+    <!-- ================= Arbeit lernen: Auswahl ================= -->
+    <section id="view-testsetup" class="view">
+      <div class="panel narrow">
+        <h2>Arbeit lernen</h2>
+        <div id="test-paused" class="banner" hidden></div>
+
+        <h3>Tests und Gruppen</h3>
+        <div id="test-groups"></div>
+        <p class="small"><button id="test-all" class="link">Alle auswählen</button> · <button id="test-none" class="link">Keine</button></p>
+
+        <h3>Was abfragen?</h3>
+        <div id="test-types" class="checklist"></div>
+
+        <h3>Einträge <span class="muted small">(Häkchen weg = wird nicht abgefragt)</span></h3>
+        <div class="entry-tools">
+          <span><button id="entries-all" class="link">Alle</button> · <button id="entries-none" class="link">Keine</button></span>
+          <span class="parts">
+            In Teile aufteilen:
+            <input type="number" id="part-size" min="1" max="200" value="10" class="num-input"> pro Teil
+            <span id="part-buttons" class="part-buttons"></span>
+          </span>
+        </div>
+        <div id="test-entries" class="entry-list"></div>
+
+        <h3>Richtung <span class="muted small">(für Vokabeln und Sätze; bei Synonymen und Gegenteilen wird immer Wort 1 gezeigt, du tippst Wort 2)</span></h3>
+        <label class="radio"><input type="radio" name="direction" value="de-en" checked> Deutsch → Englisch</label>
+        <label class="radio"><input type="radio" name="direction" value="en-de"> Englisch → Deutsch</label>
+
+        <h3>Block</h3>
+        <label class="radio"><input type="number" id="test-blocksize" min="1" max="100" class="num-input"> Wörter pro Block (erst einprägen, dann abfragen)</label>
+
+        <div class="button-row spaced">
+          <button id="test-start" class="primary">Starten</button>
+          <span id="test-count" class="muted"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Abfrage ================= -->
+    <section id="view-quiz" class="view">
+      <div class="quiz">
+        <div class="quiz-top">
+          <span id="quiz-progress-text"></span>
+          <span class="quiz-top-actions">
+            <button id="quiz-mark" class="mark-btn"></button>
+            <button id="quiz-abort" class="link" data-nav="home" title="Die Runde wird gemerkt, du kannst sie später fortsetzen">Runde unterbrechen</button>
+          </span>
+        </div>
+        <div class="progress"><div id="quiz-progress-bar"></div></div>
+
+        <!-- 1. oben: das abgefragte Wort -->
+        <div class="q-prompt-area">
+          <div id="quiz-label" class="q-label"></div>
+          <div class="q-prompt">
+            <span id="quiz-prompt"></span>
+            <span id="quiz-repeat" class="badge-repeat" hidden>Wiederholung</span>
+          </div>
+        </div>
+
+        <!-- Einprägen: Lösung wird direkt gezeigt -->
+        <div id="card-area" class="card-area" hidden>
+          <div id="card-answer" class="card-answer"></div>
+          <div id="card-remark" class="remark"></div>
+        </div>
+
+        <!-- 2. Mitte: Eingabe -->
+        <div id="input-area" class="input-area">
+          <input type="text" id="quiz-input" class="quiz-input" autocomplete="off" autocorrect="off"
+                 autocapitalize="off" spellcheck="false">
+          <p id="quiz-hint" class="hint"></p>
+        </div>
+
+        <!-- 3. unten: Ergebnis / Lösung -->
+        <div id="quiz-result" class="result" hidden></div>
+
+        <div class="quiz-buttons">
+          <button id="card-back" hidden>Zurück</button>
+          <button id="card-next" class="primary" hidden>Weiter</button>
+          <button id="quiz-check" class="primary">Prüfen</button>
+          <button id="quiz-dontknow">Ich weiß nicht</button>
+          <button id="quiz-accept" hidden>Gelten lassen</button>
+          <button id="quiz-next" class="primary" hidden>Weiter</button>
+        </div>
+        <p id="quiz-keys" class="keys"></p>
+      </div>
+    </section>
+
+    <!-- ================= Abschluss ================= -->
+    <section id="view-done" class="view">
+      <div class="panel narrow center">
+        <h2>Runde geschafft</h2>
+        <p id="done-text" class="figures"></p>
+        <button data-nav="home" class="primary">Zur Startseite</button>
+      </div>
+    </section>
+
+    <!-- ================= Import ================= -->
+    <section id="view-import" class="view">
+      <div class="panel">
+        <h2>CSV importieren</h2>
+        <p class="muted">CSV mit Semikolon, UTF-8. Kopfzeile <code>Deutsch;Englisch;Gruppe;Typ</code> – die Spalte Typ ist freiwillig:
+          leer = Vokabel, oder <code>Synonym</code>, <code>Gegenteil</code>, <code>Satz</code>.
+          Bei Synonym/Gegenteil stehen in den ersten beiden Spalten die beiden englischen Wörter.
+          Text in Klammern wird nicht abgefragt, sondern als Bemerkung angezeigt.</p>
+        <div id="dropzone" class="dropzone">
+          CSV-Datei hierher ziehen oder
+          <button id="import-choose">Datei auswählen</button>
+          <input type="file" id="import-file" accept=".csv,text/csv,text/plain" hidden>
+        </div>
+
+        <div id="import-preview" hidden>
+          <h3>Vorschau <span id="import-filename" class="muted"></span></h3>
+          <label class="import-test">Test
+            <input type="text" id="import-test" list="test-list" placeholder="z. B. Englisch-Arbeit 2 (freiwillig)" autocomplete="off">
+            <span class="muted small">Alle Gruppen dieser Datei werden unter diesem Test einsortiert. Leer lassen = ohne Test.</span>
+          </label>
+          <p id="import-summary"></p>
+          <div class="table-wrap">
+            <table class="data preview">
+              <thead><tr><th>#</th><th>Deutsch / Wort 1</th><th>Englisch / Wort 2</th><th>Gruppe</th><th>Typ</th><th>Hinweis</th><th></th></tr></thead>
+              <tbody id="import-rows"></tbody>
+            </table>
+          </div>
+          <div class="button-row spaced">
+            <button id="import-apply" class="primary">Übernehmen</button>
+            <button id="import-cancel">Verwerfen</button>
+          </div>
+        </div>
+        <p id="import-message" class="message"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Einzeln hinzufügen</h2>
+        <form id="add-form" class="add-form" autocomplete="off">
+          <label>Typ<select id="add-type"></select></label>
+          <label><span id="add-de-label">Deutsch</span><input type="text" id="add-de" required></label>
+          <label><span id="add-en-label">Englisch</span><input type="text" id="add-en" required></label>
+          <label>Test (freiwillig)<input type="text" id="add-test" list="test-list" placeholder="z. B. Englisch-Arbeit 2"></label>
+          <label>Gruppe<input type="text" id="add-group" list="group-list" required placeholder="z. B. Seite 142"></label>
+          <button type="submit" class="primary">Hinzufügen</button>
+        </form>
+        <datalist id="group-list"></datalist>
+        <datalist id="test-list"></datalist>
+        <p id="add-message" class="message"></p>
+      </div>
+    </section>
+
+    <!-- ================= Verwaltung ================= -->
+    <section id="view-manage" class="view">
+      <div class="manage">
+        <aside class="panel groups-panel">
+          <h2>Tests &amp; Gruppen</h2>
+          <ul id="group-items" class="group-items"></ul>
+          <form id="new-test-form" class="inline-form" autocomplete="off">
+            <input type="text" id="new-test-name" placeholder="Neuer Test" required>
+            <button type="submit">Anlegen</button>
+          </form>
+          <form id="new-group-form" class="inline-form" autocomplete="off">
+            <input type="text" id="new-group-name" placeholder="Neue Gruppe" required>
+            <button type="submit">Anlegen</button>
+          </form>
+          <p id="tree-tip" class="muted small tree-tip">Tipp: Eine Gruppe mit der Maus auf einen Test ziehen, um sie dort einzusortieren.</p>
+        </aside>
+
+        <div class="panel vocab-panel">
+          <div id="manage-empty" class="muted">Noch nichts vorhanden. Lege links einen Test oder eine Gruppe an oder importiere eine CSV-Datei.</div>
+          <div id="manage-content" hidden>
+            <div class="group-head">
+              <h2 id="manage-title"></h2>
+              <!-- Aktionen, wenn links eine Gruppe gewählt ist -->
+              <div class="button-row" id="group-actions" hidden>
+                <label class="check">Test: <select id="group-test" class="small-select" title="Gruppe in einen Test einsortieren"></select></label>
+                <button id="group-rename">Umbenennen</button>
+                <button id="group-delete" class="danger">Gruppe löschen</button>
+              </div>
+              <!-- Aktionen, wenn links ein Test gewählt ist -->
+              <div class="button-row" id="test-actions" hidden>
+                <button id="test-rename">Umbenennen</button>
+                <button id="test-dissolve" title="Der Test wird entfernt, seine Gruppen bleiben erhalten">Auflösen</button>
+                <button id="test-delete" class="danger">Test mit Gruppen löschen</button>
+              </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-row">
+              <input type="search" id="manage-search" placeholder="Suchen" class="search">
+              <select id="manage-type" title="Typ"></select>
+              <select id="manage-stage" title="Fach"></select>
+              <label class="check"><input type="checkbox" id="manage-problems"> nur Problemwörter</label>
+              <label class="check"><input type="checkbox" id="manage-due"> nur heute fällige</label>
+              <label class="check"><input type="checkbox" id="manage-marked"> nur Merkliste</label>
+            </div>
+
+            <!-- Aktionen für ausgewählte Einträge -->
+            <div id="bulk-bar" class="bulk-bar" hidden>
+              <span id="bulk-count"></span>
+              <button id="bulk-practice" class="primary small">Auswahl üben</button>
+              <select id="bulk-stage" class="small-select" title="Fach setzen"></select>
+              <button id="bulk-due" class="small">Fällig machen</button>
+              <select id="bulk-move" class="small-select" title="In Gruppe verschieben"></select>
+              <select id="bulk-mark" class="small-select" title="Merkliste">
+                <option value="">Merkliste …</option>
+                <option value="on">Auf die Merkliste</option>
+                <option value="off">Von der Merkliste nehmen</option>
+              </select>
+              <button id="bulk-reset" class="small">Zähler zurücksetzen</button>
+              <button id="bulk-delete" class="small danger">Löschen</button>
+              <button id="bulk-clear" class="link small">Auswahl aufheben</button>
+            </div>
+
+            <div class="table-wrap">
+              <table class="data manage-table">
+                <thead><tr>
+                  <th class="cb"><input type="checkbox" id="manage-all" title="Alle angezeigten auswählen"></th>
+                  <th data-sort="marked" class="mark-cell" title="Merkliste">★</th>
+                  <th data-sort="de">Deutsch / Wort 1</th>
+                  <th data-sort="en">Englisch / Wort 2</th>
+                  <th data-sort="type">Typ</th>
+                  <th data-sort="group">Gruppe</th>
+                  <th data-sort="stage">Fach</th>
+                  <th data-sort="due">Fällig</th>
+                  <th data-sort="right" class="num" title="Wie oft richtig">✓</th>
+                  <th data-sort="wrong" class="num" title="Wie oft falsch">✗</th>
+                  <th data-sort="last">Zuletzt</th>
+                  <th></th>
+                </tr></thead>
+                <tbody id="manage-rows"></tbody>
+              </table>
+            </div>
+            <p id="manage-count" class="muted small"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Die Programmdateien liegen im Unterordner "programm" -->
+  <script src="programm/compare.js"></script>
+  <script src="programm/data.js"></script>
+  <script src="programm/filesave.js"></script>
+  <script src="programm/quiz.js"></script>
+  <script src="programm/app.js"></script>
+  <script src="programm/pwa.js"></script>
+</body>
+</html>
